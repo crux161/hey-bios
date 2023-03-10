@@ -1,28 +1,41 @@
-
-otloader Readme
-
-x86\_64 Bootloader Readme
+# hey-bios Bootloader
 =========================
 
 This is a simple x86\_64 bootloader that prints the message "Hello, world!" to the screen.
 
-Usage
------
+## Prerequisites
 
-First, compile the bootloader:
+- NASM
+- QEMU
 
-nasm -f bin bootloader.asm -o bootloader.bin
+## Compiling and Running
 
-Then, create a disk image using the bootloader as the boot sector:
+To compile and run the bootloader, follow these steps:
 
-dd if=/dev/zero of=disk.img bs=512 count=2880
-    dd if=bootloader.bin of=disk.img conv=notrunc
+    Clone this repository:
 
-    Finally, run the disk image in QEMU:
+	git clone https://github.com/crux161/hey-bios.git
+	cd hey-bios
 
-    qemu-system-x86\_64 -drive file=disk.img,index=0,if=floppy,format=raw
+    Compile the bootloader:
+	nasm -f bin bootloader.s -o loader.bin
 
-    License
-    -------
+    or run:
+	./build.sh
 
-    This project is licensed under the MIT License. See LICENSE file for details.
+    Prepare the disk image for qemu:
+    	qemu-img create boot.img 2M
+	fdisk ./boot.img  # you need to make a new primary partition and write that to the disk image before exiting.
+	fdisk -l boot.img # this should show a primary partition having been created, a necessary step to proceed.
+	dd if=./loader.bin of=./boot.img conv=notrunc
+
+    Run the bootloader:
+	qemu-system-x86_64 -drive format=raw,file=boot.img
+	
+
+If successful, you should see "Hello world!" printed to the screen.
+
+
+## License
+
+This project is licensed under the MIT License. See LICENSE file for details.
